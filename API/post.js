@@ -2,6 +2,21 @@ import { Router } from "express";
 import prisma from "../DB/db.config.js";
 const router = Router();
 
+//students
+router.post('/students', async (req, res) => {
+    let data = req.body;
+    data = {...data, batch: parseInt(data.batch), courseId: parseInt(data.courseId)}
+    try {
+        const student = await prisma.students.create({
+            data: data
+        })
+        res.status(201).json(student)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
 
 //courses
 router.post('/courses', async (req, res) => {

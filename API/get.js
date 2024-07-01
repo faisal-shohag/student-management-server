@@ -25,6 +25,7 @@ router.get('/courses/:id', async(req, res) => {
                 students: true,
                 assignments: true, 
                 feed_backs: true,
+                students: true,
                 modules: {
                     include: {
                         assignments: true,
@@ -95,6 +96,30 @@ router.get('/courses/resources/:id', async(req, res) => {
         })
         res.status(200).json(resource)
     } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+router.get('/students', async (req, res) => {
+    try {
+        const students = await prisma.students.findMany();
+        res.status(200).json(students)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+router.get('/students/:id', async(req, res) => {
+    const id = req.params.id;
+    try {
+        const student = await prisma.students.findUnique({
+            where: {
+                id: Number(id)
+            },
+        })
+        res.status(200).json(student)
+    } catch (error) {
+        console.log(error)
         res.status(500).json({ error: error.message })
     }
 })
