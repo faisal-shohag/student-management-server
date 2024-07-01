@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Students {
+  id              Int                    @id @default(autoincrement())
+  name            String?
+  photoURL        String?
+  id_no           String?
+  created_at      DateTime               @default(now())
+  email           String
+  password        String
+  phone           String?
+  admission_slip  String
+  additional_info Json?
+  courses         StudentCourse[]
+  assignments     SubmittedAssignments[]
+  feedBacks       Feedbacks[]
+}
+
+model StudentCourse {
+  id        Int       @id @default(autoincrement())
+  studentId Int?
+  courseId  Int?
+  student   Students? @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  course    Courses?  @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([studentId, courseId])
+}
+
+model Courses {
+  id          Int             @id @default(autoincrement())
+  title       String
+  photoURL    String?
+  description String?
+  students    StudentCourse[]
+  modules     Modules[]
+  batch       Int
+  status      String          @default("ongoing")
+  feed_backs  Feedbacks[]
+  assignments Assignments[]
+}
+
+model Modules {
+  id          Int           @id @default(autoincrement())
+  title       String
+  heading     String?
+  photoURL    String?
+  days        String?
+  description String?
+  course      Courses       @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  courseId    Int
+  assignments Assignments[]
+  resources   Resources[]
+  class       Classes[]
+  study_plan  String
+  status      String        @default("ongoing")
+  recordings  Recordings[]
+}
+
+model Classes {
+  id       Int      @id @default(autoincrement())
+  title    String
+  link     String?
+  date     DateTime @default(now())
+  module   Modules  @relation(fields: [moduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  moduleId Int
+}
+
+model Assignments {
+  id          Int      @id @default(autoincrement())
+  title       String
+  photoURL    String?
+  description String
+  deadline    DateTime
+  module      Modules  @relation(fields: [moduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  moduleId    Int
+  course      Courses  @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  courseId    Int
+  link        String?
+}
+
+model Recordings {
+  id         Int      @id @default(autoincrement())
+  title      String
+  link       String
+  date       DateTime @default(now())
+  class_type String
+  module     Modules  @relation(fields: [moduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  moduleId   Int
+}
+
+model Resources {
+  id       Int      @id @default(autoincrement())
+  title    String
+  link     String
+  date     DateTime @default(now())
+  module   Modules  @relation(fields: [moduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  moduleId Int
+}
+
+model SubmittedAssignments {
+  id Int @id @default(autoincrement())
+
+  student      Students    @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId    Int
+  instructor   Instructors @relation(fields: [instructorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  instructorId Int
+  status       String      @default("pending")
+}
+
+model Instructors {
+  id              Int                    @id @default(autoincrement())
+  name            String
+  photoURL        String?
+  assignmnents    SubmittedAssignments[]
+  role            String                 @default("user")
+  additional_info Json?
+}
+
+model Feedbacks {
+  id        Int      @id @default(autoincrement())
+  text      String
+  course    Courses  @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  courseId  Int
+  star      Int?
+  student   Students @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId Int
+}
