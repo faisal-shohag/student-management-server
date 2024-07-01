@@ -70,7 +70,7 @@ router.get('/courses/assignments/:id', async(req, res) => {
     }
 })
 
-router.get('courses/recordings/:id', async(req, res) => {
+router.get('/courses/recordings/:id', async(req, res) => {
     const id = req.params.id;
     try {
         const recording = await prisma.recordings.findUnique({
