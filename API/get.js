@@ -28,7 +28,8 @@ router.get('/courses/:id', async(req, res) => {
                 modules: {
                     include: {
                         assignments: true,
-                        recordings: true
+                        recordings: true,
+                        resources: true
                     }
                 }
             }
