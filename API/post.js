@@ -75,6 +75,20 @@ router.post('/recordings', async (req, res) => {
 })
 
 
+router.post('/resources', async (req, res) => {
+    let data = req.body;
+    data = {...data, date: new Date(data.date), moduleId: parseInt(data.moduleId)}
+    try {
+        const resource = await prisma.resources.create({
+            data: data
+        })
+        res.status(201).json(resource)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
 
 
 export default router;
