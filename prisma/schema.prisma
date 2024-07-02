@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  //directUrl = env("DIRECT_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Students {
@@ -14,7 +14,7 @@ model Students {
   photoURL        String?
   id_no           String?
   created_at      DateTime               @default(now())
-  email           String
+  email           String  @unique
   password        String
   batch           Int?
   phone           String?
@@ -25,6 +25,7 @@ model Students {
   courseId Int
   assignments     SubmittedAssignments[]
   feedBacks       Feedbacks[]
+  courses         StudentCourses[]
 }
 
 
@@ -41,6 +42,15 @@ model Courses {
   assignments Assignments[]
   recordings Recordings[]
   resources Resources[]
+  courses         StudentCourses[]
+}
+
+model StudentCourses {
+  studentId Int
+  courseId  Int
+  student   Students @relation(fields: [studentId], references: [id])
+  course    Courses  @relation(fields: [courseId], references: [id])
+  @@id([studentId, courseId])
 }
 
 model Modules {
@@ -58,6 +68,8 @@ model Modules {
   study_plan  String
   status      String        @default("ongoing")
   recordings  Recordings[]
+  submittedAssignments SubmittedAssignments[]
+  
 }
 
 model Classes {
@@ -107,11 +119,10 @@ model Resources {
 
 model SubmittedAssignments {
   id Int @id @default(autoincrement())
-
+  module   Modules  @relation(fields: [moduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  moduleId Int
   student      Students    @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   studentId    Int
-  instructor   Instructors @relation(fields: [instructorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  instructorId Int
   status       String      @default("pending")
 }
 
@@ -119,7 +130,6 @@ model Instructors {
   id              Int                    @id @default(autoincrement())
   name            String
   photoURL        String?
-  assignmnents    SubmittedAssignments[]
   role            String                 @default("user")
   additional_info Json?
 }

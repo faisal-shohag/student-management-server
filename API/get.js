@@ -13,6 +13,7 @@ router.get('/courses', async (req, res) => {
 })
 
 
+
 router.get('/courses/:id', async(req, res) => {
     const id = req.params.id;
     try {
@@ -116,7 +117,29 @@ router.get('/students/:id', async(req, res) => {
             where: {
                 id: Number(id)
             },
+            include:{
+                courses: true
+            }
         })
+        res.status(200).json(student)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
+router.get('/users/:email', async(req, res) => {
+    const email = req.params.email;
+    try {
+        const student = await prisma.students.findUnique({
+            where: {
+                email: email
+            },
+            include:{
+                courses: true
+            }
+        })
+        
         res.status(200).json(student)
     } catch (error) {
         console.log(error)
