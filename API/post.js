@@ -104,6 +104,50 @@ router.post('/resources', async (req, res) => {
     }
 })
 
+router.post('/confirm', async (req, res) => {
+    let data = req.body;
+    console.log("data: ", data)
+    try {
+
+        const studentCourse = await prisma.studentCourses.findUnique({
+            where: {
+              studentId_courseId: data,
+            },
+          });
+
+          console.log("student_course: ", studentCourse)
+
+          let confirm
+
+        if(!studentCourse) {
+            confirm = await prisma.studentCourses.create({
+                data: data
+            })
+        }
+        
+
+        const student = await prisma.students.findUnique({
+            where: {
+                id: Number(data.studentId)
+            },
+        })
+
+        let status = student.status === "pending" ? "confirmed" : "pending"
+
+        const updatedStudent = await prisma.students.update({
+            where: { id: Number(data.studentId) },
+            data: {
+             status: status
+            },
+          });
+
+        res.status(201).json({updatedStudent})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
 
 
 export default router;

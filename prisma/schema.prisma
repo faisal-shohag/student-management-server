@@ -48,8 +48,8 @@ model Courses {
 model StudentCourses {
   studentId Int
   courseId  Int
-  student   Students @relation(fields: [studentId], references: [id])
-  course    Courses  @relation(fields: [courseId], references: [id])
+  student   Students @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  course    Courses  @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   @@id([studentId, courseId])
 }
 

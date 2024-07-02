@@ -115,11 +115,33 @@ router.get('/students/:id', async(req, res) => {
     try {
         const student = await prisma.students.findUnique({
             where: {
-                id: Number(id)
-            },
-            include:{
-                courses: true
-            }
+                id: Number(id),
+              },
+              include: {
+                courses: {
+                  include: {
+                    course: {
+                        
+                        include: {
+                            modules: {
+                                include: {
+                                    assignments: true,
+                                    recordings: true,
+                            resources: true
+                                }
+                            },
+                            recordings: true,
+                            resources: true
+                        }
+                    }
+                  },
+                },
+                assignments: true,
+                
+              },
+           
+            
+        
         })
         res.status(200).json(student)
     } catch (error) {
@@ -133,18 +155,46 @@ router.get('/users/:email', async(req, res) => {
     try {
         const student = await prisma.students.findUnique({
             where: {
-                email: email
-            },
-            include:{
-                courses: true
-            }
+                email: email,
+              },
+              include: {
+                
+                courses: {
+                  include: {
+                    course: {
+                        
+                        include: {
+                            modules: {
+                                include: {
+                                    assignments: true,
+                                    recordings: true,
+                            resources: true
+                                }
+                            },
+                            
+                            recordings: true,
+                            resources: true,
+                            assignments: true,
+                        }
+                        
+                    }
+                  },
+                },
+                
+                assignments: true,               
+              },
         })
+
+
         
-        res.status(200).json(student)
+        res.status(200).json({...student, course:student.courses[0].course})
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: error.message })
     }
 })
+
+
+
 
 export default router;
