@@ -8,6 +8,7 @@ router.get("/courses", async (req, res) => {
     const courses = await prisma.courses.findMany();
     res.status(200).json(courses);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 });
@@ -181,7 +182,7 @@ router.get("/users/:email", async (req, res) => {
       },
     });
 
-    res.status(200).json({ ...student, course: student.courses[0].course });
+    res.status(200).json({ ...student, course: student ? student.courses[0].course: [] });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
