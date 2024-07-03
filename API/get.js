@@ -135,7 +135,11 @@ router.get("/students/:id", async (req, res) => {
             },
           },
         },
-        assignments: true,
+        assignments: {
+          include: {
+            assignment: true,
+          },
+        },
       },
     });
     res.status(200).json(student);
@@ -190,9 +194,9 @@ router.get('/assignments/submission/:studentId/:moduleId/:assignmentId', async (
         const submissions = await prisma.submittedAssignments.findUnique({
           where: {
             studentId_moduleId_assignmentId: {
-              assignmentId: parseInt(req.params.assignmentId),
               studentId: parseInt(req.params.studentId),
-              moduleId: parseInt(req.params.moduleId)
+              moduleId: parseInt(req.params.moduleId),
+              assignmentId: parseInt(req.params.assignmentId),
             }
           },
             include: {
@@ -206,4 +210,21 @@ router.get('/assignments/submission/:studentId/:moduleId/:assignmentId', async (
     }
 })
 
+
+router.get('/assignments/:studentId', async(req, res) => {
+    try {
+        const assignments = await prisma.submittedAssignments.findMany({
+            where: {
+                studentId: parseInt(req.params.studentId)
+            },
+            include: {
+                assignment: true
+            }
+        })
+        res.status(200).json(assignments)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: error.message })
+    }
+})
 export default router;

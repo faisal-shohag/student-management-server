@@ -93,6 +93,7 @@ model Assignments {
   courseId    Int
   link        String?
   submissions SubmittedAssignments[]
+  marks       Float @default(0)
 }
 
 model Recordings {
@@ -129,6 +130,7 @@ model SubmittedAssignments {
   assignmentId Int
   marks Float @default(0)
   task      String? 
+  feedback  String?
   @@unique([studentId, moduleId, assignmentId])
 }
 
