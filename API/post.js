@@ -148,6 +148,19 @@ router.post('/confirm', async (req, res) => {
     }
 })
 
+router.post('/courses/assignments/submission', async(req, res) => {
+     let data = req.body;
+     data = {...data, assignmentId: parseInt(data.assignmentId), studentId: parseInt(data.studentId)}
+     try {
+        const submission = await prisma.submittedAssignments.create({
+            data: data
+        })
+        res.status(201).json(submission)
+     } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: error.message })
+     }
+})
 
 
 export default router;

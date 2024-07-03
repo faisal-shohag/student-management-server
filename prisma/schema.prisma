@@ -92,6 +92,7 @@ model Assignments {
   course      Courses  @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   courseId    Int
   link        String?
+  submissions SubmittedAssignments[]
 }
 
 model Recordings {
@@ -124,6 +125,11 @@ model SubmittedAssignments {
   student      Students    @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   studentId    Int
   status       String      @default("pending")
+  assignment  Assignments @relation(fields: [assignmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  assignmentId Int
+  marks Float @default(0)
+  task      String? 
+  @@unique([studentId, moduleId, assignmentId])
 }
 
 model Instructors {
