@@ -129,6 +129,8 @@ model SubmittedAssignments {
   assignment  Assignments @relation(fields: [assignmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   assignmentId Int
   marks Float @default(0)
+  homework_marks Float @default(0)
+  class_performance_marks Float @default(0)
   task      String? 
   feedback  String?
   @@unique([studentId, moduleId, assignmentId])

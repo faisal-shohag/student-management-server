@@ -169,7 +169,6 @@ router.get("/users/:email", async (req, res) => {
                     resources: true,
                   },
                 },
-
                 recordings: true,
                 resources: true,
                 assignments: true,
@@ -177,17 +176,80 @@ router.get("/users/:email", async (req, res) => {
             },
           },
         },
-
         assignments: true,
       },
     });
 
-    res.status(200).json({ ...student, course: student ? student.courses[0].course: [] });
+    if (student) {
+      // Get the first course
+      const firstCourse = student.courses[0]?.course;
+      if (firstCourse) {
+        // Get the module IDs of the first course
+        const moduleIds = firstCourse.modules.map((module) => module.id);
+
+        // Fetch all submitted assignments for the student for the first course modules
+        const submittedAssignments = await prisma.submittedAssignments.findMany({
+          where: {
+            studentId: student.id,
+            moduleId: { in: moduleIds },
+          },
+        });
+
+        // Calculate the total marks for each category
+        const totalHomeworkMarks = submittedAssignments.reduce((acc, sa) => acc + sa.homework_marks, 0);
+        const totalAssignmentMarks = submittedAssignments.reduce((acc, sa) => acc + sa.marks, 0);
+        const totalClassPerformanceMarks = submittedAssignments.reduce((acc, sa) => acc + sa.class_performance_marks, 0);
+
+        // Calculate the total possible marks for each category
+        const totalAssignments = submittedAssignments.length;
+        const totalPossibleMarks = totalAssignments * 10; // Assuming each assignment is worth 10 marks
+        const totalPossibleHomeworkMarks = totalAssignments * 10;
+        const totalPossibleAssignmentMarks = totalAssignments * 10;
+        const totalPossibleClassPerformanceMarks = totalAssignments * 10;
+
+        // Calculate percentages
+        const homeworkPercentage = totalPossibleHomeworkMarks ? (totalHomeworkMarks / totalPossibleHomeworkMarks) * 100 : 0;
+        const assignmentPercentage = totalPossibleAssignmentMarks ? (totalAssignmentMarks / totalPossibleAssignmentMarks) * 100 : 0;
+        const classPerformancePercentage = totalPossibleClassPerformanceMarks ? (totalClassPerformanceMarks / totalPossibleClassPerformanceMarks) * 100 : 0;
+
+        // Calculate course progress percentage
+        const completedModules = new Set(submittedAssignments.map(sa => sa.moduleId)).size;
+        const totalModules = firstCourse.modules.length;
+        const courseProgressPercentage = totalModules ? (completedModules / totalModules) * 100 : 0;
+
+        // Include the percentages and progress in the response
+        const response = {
+          ...student,
+          course: firstCourse,
+          homeworkPercentage,
+          assignmentPercentage,
+          classPerformancePercentage,
+          courseProgressPercentage,
+        };
+
+        res.status(200).json(response);
+      } else {
+        const response = {
+          ...student,
+          course: [],
+          homeworkPercentage: 0,
+          assignmentPercentage: 0,
+          classPerformancePercentage: 0,
+          courseProgressPercentage: 0,
+        };
+        res.status(200).json(response);
+      }
+    } else {
+      res.status(404).json({ error: "Student not found" });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
   }
 });
+
+
+
 
 
 router.get('/assignments/submission/:studentId/:moduleId/:assignmentId', async (req, res) => {
