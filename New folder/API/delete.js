@@ -18,22 +18,6 @@ router.delete('/modules/:id', async (req, res) => {
 })
 
 
-router.delete('/courses/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const course = await prisma.courses.delete({
-            where: {
-                id: parseInt(id)
-            }
-        })
-        res.status(200).json(course)
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ error: error.message })
-    }
-})
-
-
 
 
 

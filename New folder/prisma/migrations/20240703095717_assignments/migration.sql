@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Assignments" ADD COLUMN     "marks" DOUBLE PRECISION NOT NULL DEFAULT 0;
