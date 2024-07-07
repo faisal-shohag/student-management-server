@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Students {
@@ -21,7 +21,7 @@ model Students {
   admission_slip  String
   additional_info Json?
   status String @default("pending")
-  course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  course Courses @relation(fields: [courseId], references: [id], onUpdate: Cascade)
   courseId Int
   assignments     SubmittedAssignments[]
   feedBacks       Feedbacks[]
@@ -48,7 +48,7 @@ model Courses {
 model StudentCourses {
   studentId Int
   courseId  Int
-  student   Students @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  student   Students @relation(fields: [studentId], references: [id], onUpdate: Cascade)
   course    Courses  @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   @@id([studentId, courseId])
 }
